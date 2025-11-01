@@ -3,13 +3,38 @@ import socket
 import machine
 import neopixel
 import time
+import json
 
+# Alapértelmezett értékek
 SSID = ""
 PASSWORD = ""
 LED_PIN_NUM = 5  # D1 pin az ESP8266-on
-NUM_LEDS = 120 # Kanapé 120, TV 180 
-LED_STEP = 3
+NUM_LEDS = 10   # Kanapé 120, TV 180 
+LED_STEP = 2
 LISTEN_PORT = 80
+CONFIG_FILE = 'config.json'
+
+# --- Konfiguráció betöltése ---
+try:
+    with open(CONFIG_FILE, 'r') as f:
+        config = json.load(f)
+        # A 'get' metódus biztonságos: ha a kulcs létezik, az értékét adja,
+        # ha nem, akkor a második argumentumként megadott alapértelmezett értéket.
+        SSID = config.get('SSID', SSID)
+        PASSWORD = config.get('PASSWORD', PASSWORD)
+        LED_PIN_NUM = config.get('LED_PIN_NUM', LED_PIN_NUM)
+        NUM_LEDS = config.get('NUM_LEDS', NUM_LEDS)
+        LED_STEP = config.get('LED_STEP', LED_STEP)
+        LISTEN_PORT = config.get('LISTEN_PORT', LISTEN_PORT)
+        
+    print(f"Sikeresen betöltve a {CONFIG_FILE} fájlból.")
+    print(f"SSID: {SSID}")
+    print(f"LED Pin: {LED_PIN_NUM}, LED Count: {NUM_LEDS}, LED Step: {LED_STEP}")
+
+except OSError:
+    print(f"Figyelem: A {CONFIG_FILE} nem található. Alapértelmezett értékek használata.")
+except (ValueError, KeyError) as e:
+    print(f"Hiba: A {CONFIG_FILE} sérült vagy hiányos: {e}. Alapértelmezett értékek használata.")
 
 # --- Globális Változók ---
 # LED szalag inicializálása
@@ -160,11 +185,11 @@ def start_server():
             response_header = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n"
             json_response = '{ "status": "ok" }'
 
-            if 'GET /on' in request:
+            if 'POST /on' in request:
                 led_on()
-            elif 'GET /off' in request:
+            elif 'POST /off' in request:
                 led_off()
-            elif 'GET /color' in request:
+            elif 'POST /color' in request:
                 # Az eredeti kód 'R.G.B' formátumot várt. Ezt várjuk a 'v' paraméterben.
                 # Pl: http://[IP]/color?v=255.100.0
                 color_val = get_query_param(request, 'v')
@@ -178,7 +203,7 @@ def start_server():
                 else:
                     json_response = '{ "status": "error", "message": "Missing color value. Use ?v=R.G.B" }'
 
-            elif 'GET /brightness' in request:
+            elif 'POST /brightness' in request:
                 # Pl: http://[IP]/brightness?v=150
                 bright_val = get_query_param(request, 'v')
                 if bright_val:

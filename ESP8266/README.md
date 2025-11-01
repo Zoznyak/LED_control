@@ -43,3 +43,17 @@
 ### Debug
 A serial monitor telepítése után a VS Code-on belül lehet monitorozni a kommunikációt. Ehhez disconnectelni kell a Picot, majd a "Serial monitor" fülön a Baud rate: 115200 és a megfelelő port(5).
 
+## API
+* POST /color?v=255.100.0 (R.G.B 0-255)
+* POST /brightness?v=150 (0-255)
+* POST /on
+* POST /off
+
+## Konfiguráció
+A config.json tartalmazza a különböző konfigurációs értékeket. Ezt lokálisan kell létrehozni, a gitbe érzékeny adatok miatt nem kerül fel.
+* "SSID": wifi neve
+* "PASSWORD": wifi jelszó
+* "LED_PIN_NUM": a boardon a LED-ekre vezérlésére használt pin száma (D1: 5)
+* "NUM_LEDS": vezérelni kívánt LED-ek darabszáma
+* "LED_STEP": ha nem akarjuk az összes LED-et vezérelni akkor itt adható meg minden hányadik LED legyen vezérelve
+* "LISTEN_PORT"
