@@ -7,8 +7,8 @@ import time
 SSID = ""
 PASSWORD = ""
 LED_PIN_NUM = 5  # D1 pin az ESP8266-on
-NUM_LEDS = 180
-LED_STEP = 4
+NUM_LEDS = 120 # Kanapé 120, TV 180 
+LED_STEP = 3
 LISTEN_PORT = 80
 
 # --- Globális Változók ---
